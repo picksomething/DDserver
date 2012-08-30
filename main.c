@@ -18,13 +18,13 @@ int main(void){
 		connfd = accept( server_sock, NULL, NULL );
 		p = get_request(connfd);
 		if( p->status != 0 )
-			send_response( connfd, p->status );
+			send_response( p  );
 		if( strcmp(p->method,"GET") == 0 )
 			process_get(p);
 		else if( strcmp(p->method,"HEAD") == 0 )
 			process_head(p);
 		else 
-			send_response( connfd, 0 ); // NOT IMPLEMENT
+			send_response( p ); // NOT IMPLEMENT
 
 		close(connfd);
 	}

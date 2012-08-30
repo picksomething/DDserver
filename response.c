@@ -1,7 +1,7 @@
 #include"dd.h"
 
-void send_response( int client, int status ){
-
+void send_response( struct request *p ){
+	
 }
 
 

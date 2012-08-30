@@ -3,6 +3,7 @@
 #include<stdlib.h>
 
 #include<unistd.h>
+#include<sys/stat.h>
 #include<sys/types.h>
 #include<sys/socket.h>
 #include<errno.h>
@@ -26,14 +27,15 @@ extern int server_sock;
 /* request */
 struct request{
 	char method[10];
-	char url[ LINEBUF * 10 ];
+	char url[ PATHBUF * 10 ];
 	char version[10];
 
 	int sock,status;
+	char res[ LINEBUF * 10 ];
 };
 struct request * get_request( int client );
 void process_get( struct request *p );
 void process_head(struct request *p );
 
 /* response */
-void send_response( int client, int status );
+void send_response( struct request *p );
