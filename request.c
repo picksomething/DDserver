@@ -6,6 +6,7 @@ struct request * get_request( int client ){
 	int  n, len;
 	
 	p->sock = client;
+	p->status = 0;
 	for( at = buf; ; at += n ){
 		n = read( client, at, LINEBUF );
 		if( n < LINEBUF ) break;
@@ -71,17 +72,17 @@ char * getfiletype( char * file, char * save ){
 }
 
 void filesend( int client, char * file ){
-	char buf[ 100 ];
+	char buf[ LINEBUF ];
 	FILE * fp;
 	
 	fp = fopen( file, "r" );
 	while( !feof(fp) ){
-		fgets( buf, 100, fp);
+		fgets( buf, LINEBUF, fp);
 		send( client, buf, strlen(buf), 0 );
 	}
 }
 
-void process_get( struct request *p ){
+void process_get( struct request *p,int isget ){
 	char file[ LINEBUF ], filetype[ 50 ];;
 	char buf[ LINEBUF ];
 	struct stat fileinfo;
@@ -93,28 +94,24 @@ void process_get( struct request *p ){
 	strcpy( file + strlen(file), p->url );
 	
 
-	lstat( file, &fileinfo );
-	if( S_ISREG( fileinfo.st_mode )  ){ /* found file */
+	if( lstat( file, &fileinfo ) < 0 ){
+		p->status = 404;
+		send_response( p );
+	}
+	else if( S_ISREG( fileinfo.st_mode )  ){ /* found file */
 			
-		strcpy( buf, "HTTP/1.1 200 OK\r\nConnection: close\r\n" );
+		strcpy( buf, "HTTP/1.1 200 OK\r\n");//Connection: close\r\n" );
 		send( p->sock, buf, strlen(buf), 0 );
-		
 		sprintf( buf, "Content-Length: %d\r\n", (int)fileinfo.st_size );
 		send( p->sock, buf, strlen(buf), 0 );
 		sprintf( buf, "Content-type: %s\r\n\r\n",getfiletype(file, filetype));
 		send( p->sock, buf, strlen(buf), 0 );
-		filesend( p->sock, file );
+
+		if( isget ) filesend( p->sock, file );
 	}
 	else if( S_ISDIR( fileinfo.st_mode ) ){
 		strcat( p->url, "/index.html" );
-		process_get( p );
+		process_get( p , isget );
 		return;
 	}
-	else{
-		p->status = 404;
-		send_response( p );
-	}
-
-}
-void process_head( struct request *p ){
 }

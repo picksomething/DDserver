@@ -34,8 +34,7 @@ struct request{
 	char res[ LINEBUF * 10 ];
 };
 struct request * get_request( int client );
-void process_get( struct request *p );
-void process_head(struct request *p );
+void process_get( struct request *p, int isget );
 
 /* response */
 void send_response( struct request *p );
