@@ -20,9 +20,20 @@ static void send_not_found( int client ){
 	send( client, buf, strlen(buf), 0 );
 }
 
+void send_move_pmnt(struct request *p ){
+	char buf[ LINEBUF ];
+
+	sprintf( buf, "HTTP/1.1 301 Move Permanently\r\n"
+				  "Connection: close\r\n"
+				  "Location: http://%s%s\r\n\r\n", p->host, p->url );
+	send( p->sock, buf, strlen(buf), 0 );
+}
+
 void send_response( struct request *p ){
 	if( p->status == 404 )
 		send_not_found( p->sock );
+	if( p->status == 301 )
+		send_move_pmnt( p );
 }
 
 
