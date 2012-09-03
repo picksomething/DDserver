@@ -2,23 +2,22 @@
 #include"dd.h"
 #include"request.h"
 
-Request::Request( int s, int status = 0 ):
+Request::Request( int s, int status ):
 	sock(s),status(status){}
 
 void Request::getRequest( void ){
 	char buf[ LINEBUF * 10 ], *at;
-	int  n, len;
-	size_t start, middle, end;
+	size_t start, end, n;
+	size_t keystart, keyend, valuestart, valueend;
 	string key, value;
 
 	for( at = buf; ; at += n ){
-		n = read( client, at, LINEBUF );
+		n = read( sock, at, LINEBUF );
 		if( n < LINEBUF ) break;
 	}
 	at += n;
 
 	msg.assign( buf, at );
-	
 	//提取METHOD
 	start = end = 0;
 	end = msg.find( ' ' , start );
@@ -34,17 +33,20 @@ void Request::getRequest( void ){
 	end = msg.find( '\r', start );
 	version = msg.substr( start, end - start );
 
-	start = end + 2;
-	while( msg.substr( start, 2 ) != "\r\n" ){
-		middle = msg.find( ": ", start );
-		end	   = msg.find( "\r\n", start );
-		key	   = msg.substr( start, middle );
-		value  = msg.substr( middle+2, end-middle-2 );
-		
+	keystart = end+2;
+	while( msg.substr( keystart, 2 ) != "\r\n" ){
+
+		keyend     = msg.find_first_of(": ", keystart) ;
+		valuestart = msg.find_first_not_of( ": ", keyend );
+		valueend   = msg.find_first_of("\r\n", valuestart );
+
+		key = msg.substr( keystart,	keyend - keystart );
+		value=msg.substr( valuestart, valueend - valuestart );
 		if( key == "Host" ) host = value;
 		
-		start = end + 2;
+		keystart = valueend + 2;
 	}
+	cout <<host << endl;
 }
 
 char * getfiletype( char * file, char * save ){
@@ -83,7 +85,7 @@ char * getfiletype( char * file, char * save ){
 
 	return save;
 }
-
+/*
 void filesend( int client, char * file ){
 	char buf[ LINEBUF ];
 	int fd,n;
@@ -106,7 +108,7 @@ void process_get( Request *p, int isget ){
 		p->status = 404;
 		send_response( p );
 	}
-	else if( S_ISREG( fileinfo.st_mode )  ){ /* found file */
+	else if( S_ISREG( fileinfo.st_mode )  ){
 			
 		strcpy( buf, "HTTP/1.1 200 OK\r\nConnection: close\r\n" );
 		send( p->sock, buf, strlen(buf), 0 );
@@ -129,3 +131,4 @@ void process_get( Request *p, int isget ){
 		}
 	}
 }
+*/

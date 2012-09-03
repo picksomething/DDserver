@@ -12,6 +12,8 @@
 #include<errno.h>
 #include<netinet/in.h>
 
+using namespace std;
+
 #define MAXCONN 88
 #define URLBUF 256
 #define PATHBUF 1024
@@ -24,20 +26,11 @@ int server_start(void);
 
 /* main */
 extern int server_port;
-extern char server_root[ PATHBUF ];
+extern string server_root;
 extern int setsockoptflag;
 extern int server_sock;
 
 /* request */
-class request{
-	string method;
-	string url;
-	string version;
-	string host;
-	int sock,status;
-};
-struct request * get_request( int client );
-void process_get( struct request *p, int isget );
+#include"request.h"
 
 /* response */
-void send_response( struct request *p );

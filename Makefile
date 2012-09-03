@@ -2,7 +2,7 @@
 CC = g++ -g -Wall
 CPP = g++ -E
 
-SOURCES = main.cpp utils.cpp request.cpp response.cpp
+SOURCES = main.cpp utils.cpp request.cpp #response.cpp
 OBJS = $(SOURCES:.c=.o)
 
 
