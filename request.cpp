@@ -1,53 +1,50 @@
 
 #include"dd.h"
+#include"request.h"
 
-struct request * get_request( int client ){
-	struct request * p; 
-	char buf[ LINEBUF * 10 ], *at, *key, *value;
+Request::Request( int s, int status = 0 ):
+	sock(s),status(status){}
+
+void Request::getRequest( void ){
+	char buf[ LINEBUF * 10 ], *at;
 	int  n, len;
-	
-	p = (struct request *)malloc( sizeof(struct request) );
-	p->sock = client;
-	p->status = 0;
+	size_t start, middle, end;
+	string key, value;
 
 	for( at = buf; ; at += n ){
 		n = read( client, at, LINEBUF );
 		if( n < LINEBUF ) break;
 	}
 	at += n;
-	*at = '\0';
 
-	at = buf;
-	for( len = 0; at[len] != ' '; len++ );
-	at[len] = '\0';
-	strcpy( p->method, at );
+	msg.assign( buf, at );
 	
-	at += len+1;
-	for( len = 0; at[len] != ' '; len++ );
-	at[len] = '\0';
-	strcpy( p->url, at );
+	//提取METHOD
+	start = end = 0;
+	end = msg.find( ' ' , start );
+	method = msg.substr( start, end - start );
+	
+	//提取url
+	start = end + 1;
+	end = msg.find( ' ', start );
+	url = msg.substr( start, end - start );
 
-	at += len+1;
-	for( len = 0; at[len] != '\r'; len++ );
-	at[len] = '\0';
-	strcpy( p->version, at );
-	
-	key = at+len+2;
-	while( *key != '\r' ){
-		for( len = 0; key[len] != ':'; len++ );
-		key[len] = '\0'; value = key+len+2;
-		for( ; key[len] != '\r'; len++ );
-		key[len] = '\0';
-		if( strcmp(key,"Host") == 0 ){
-			strcpy( p->host, value );
-		}
-		key += len+2;
+	//提取HTTP版本
+	start = end + 1;
+	end = msg.find( '\r', start );
+	version = msg.substr( start, end - start );
+
+	start = end + 2;
+	while( msg.substr( start, 2 ) != "\r\n" ){
+		middle = msg.find( ": ", start );
+		end	   = msg.find( "\r\n", start );
+		key	   = msg.substr( start, middle );
+		value  = msg.substr( middle+2, end-middle-2 );
+		
+		if( key == "Host" ) host = value;
+		
+		start = end + 2;
 	}
-	/*
-		TODO: process various headers.
-	*/
-
-	return p;
 }
 
 char * getfiletype( char * file, char * save ){
@@ -95,7 +92,7 @@ void filesend( int client, char * file ){
 		write( client, buf, n );
 }
 
-void process_get( struct request *p,int isget ){
+void process_get( Request *p, int isget ){
 	char file[ LINEBUF ], filetype[ 50 ];;
 	char buf[ LINEBUF ];
 	struct stat fileinfo;

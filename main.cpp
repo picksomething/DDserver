@@ -2,19 +2,21 @@
 #include "dd.h"
 
 int server_port = 80; 
-char server_root[ PATHBUF ] = "/var/www";
+string server_root = "/var/www";
 int setsockoptflag = 1;
 int server_sock;
 
 int main(void){
 	int connfd;
-	struct request *p;
 
+	Request *p = NULL;
 	server_sock = server_start();
-	printf("Server start running at port %d :)\n",server_port);
-	while( 1 ){
+
+	cout << "Server start running at port " << server_port << endl;
+	while( true ){
 
 		connfd = accept( server_sock, NULL, NULL );
+		
 		if( connfd < 0 ) 
 			err_exit("accept");
 		p = get_request(connfd);

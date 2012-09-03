@@ -29,15 +29,12 @@ extern int setsockoptflag;
 extern int server_sock;
 
 /* request */
-struct request{
-	char method[10];
-	char url[ PATHBUF * 10 ];
-	char version[10];
-
-	char host[ HOSTBUF ];
-
+class request{
+	string method;
+	string url;
+	string version;
+	string host;
 	int sock,status;
-	char res[ LINEBUF * 10 ];
 };
 struct request * get_request( int client );
 void process_get( struct request *p, int isget );
