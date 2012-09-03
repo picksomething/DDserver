@@ -1,6 +1,8 @@
-#include<stdio.h>
-#include<string.h>
-#include<stdlib.h>
+#include<iostream>
+#include<string>
+#include<cstdio>
+#include<cstring>
+#include<cstdlib>
 
 #include<unistd.h>
 #include<fcntl.h>

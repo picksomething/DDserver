@@ -1,8 +1,8 @@
 
-CC = gcc -g -Wall
-CPP = gcc -E
+CC = g++ -g -Wall
+CPP = g++ -E
 
-SOURCES = main.c utils.c request.c response.c
+SOURCES = main.cpp utils.cpp request.cpp response.cpp
 OBJS = $(SOURCES:.c=.o)
 
 
