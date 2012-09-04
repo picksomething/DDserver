@@ -14,6 +14,7 @@ public:
 	string msg;
 
 	Request( int s, int status = 0);
+	~Request();
 	void getRequest( void );
 	void processGet( int isget = 1 );
 

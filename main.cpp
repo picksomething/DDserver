@@ -8,6 +8,7 @@ int server_sock;
 
 int main(void){
 	int connfd;
+	set_signals();
 
 	server_sock = server_start();
 

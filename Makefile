@@ -1,8 +1,9 @@
 
-CC = g++ -g -Wall
+CC = g++
 CPP = g++ -E
+CXXFLAGS = -g -Wall
 
-SOURCES = main.cpp utils.cpp request.cpp response.cpp
+SOURCES = main.cpp utils.cpp request.cpp response.cpp signals.cpp
 OBJS = $(SOURCES:.cpp=.o)
 
 

@@ -1,6 +1,7 @@
 
 #include"dd.h"
 #include"request.h"
+
 string getfiletype( string  );
 
 void writein( int client, string file ){
@@ -59,6 +60,33 @@ void Request::send_r_301( string location ){
 }
 
 string getfiletype( string file ){
-	return "text/html";
+	size_t pos = file.find_last_of(".");
+	if( pos == file.length() )
+		return "application/octet-stream";
+	string type = file.substr(pos+1);
+	// text
+	if( type == "html" || type == "htm" ) return "text/html";
+	if( type == "css" ) return "text/css";
+	if( type == "txt" ) return "text/txt";
+	if( type == "c" ) return "text/plain";
+	// images
+	if( type == "gif" ) return "image/gif";
+	if( type == "jpg" ) return "image/jpeg";
+	if( type == "bmp" ) return "image/bmp";
+	if( type == "ico" ) return "image/x-icon";
+	if( type == "png" ) return "image/png";
+	// applications
+	if( type == "js"  ) return "application/x-javascript";
+	if( type == "pdf" ) return "application/pdf";
+	if( type == "doc" ) return "application/msword";
+	if( type == "ppt" ) return "application/vnd.ms-powerpoint";
+	//video & audio 
+	if( type == "mp3" ) return "audio/mpeg";
+	if( type == "wav" ) return "audio/x-wav";
+	if( type == "avi" ) return "vido/x-msvideo";
+	if( type == "mov" ) return "video/quicktime";
+	if( type == "mpg" ) return "video/mpeg";
+	
+	return "application/octet-stream";
 }
 

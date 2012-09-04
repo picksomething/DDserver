@@ -35,4 +35,5 @@ extern int server_sock;
 /* request */
 #include"request.h"
 
-/* response */
+/* signals */
+extern void set_signals( void );

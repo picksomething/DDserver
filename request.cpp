@@ -5,6 +5,18 @@
 Request::Request( int s, int status ):
 	sock(s),status(status){}
 
+Request::~Request(){
+	close(sock);
+}
+
+bool endswith( const char *s , const char *end ){
+	if( s == NULL || end == NULL ) return false;
+	int lens = strlen(s);
+	int lenend = strlen(end);
+	if( lenend > lens ) return false;
+	return strcmp( s + lens - lenend, end ) == 0 ;
+}
+
 void Request::getRequest( void ){
 	char buf[ LINEBUF * 10 ], *at;
 	size_t start, end, n;
@@ -13,11 +25,12 @@ void Request::getRequest( void ){
 
 	for( at = buf; ; at += n ){
 		n = read( sock, at, LINEBUF );
-		if( n < LINEBUF ) break;
+		*(at+n) = '\0';
+		if( endswith(buf,"\r\n\r\n") ) break;
 	}
 	at += n;
-
 	msg.assign( buf, at );
+
 	//提取METHOD
 	start = end = 0;
 	end = msg.find( ' ' , start );
@@ -33,8 +46,10 @@ void Request::getRequest( void ){
 	end = msg.find( '\r', start );
 	version = msg.substr( start, end - start );
 
+//	cout << msg << endl;
+
 	keystart = end+2;
-	while( msg.substr( keystart, 2 ) != "\r\n" ){
+	while( msg.substr( keystart ) != "\r\n" ){
 
 		keyend     = msg.find_first_of(": ", keystart) ;
 		valuestart = msg.find_first_not_of( ": ", keyend );
@@ -46,54 +61,9 @@ void Request::getRequest( void ){
 		
 		keystart = valueend + 2;
 	}
-	cout <<host << endl;
+	//cout <<host << endl;
 }
 
-char * getfiletype( char * file, char * save ){
-	
-	int len; 
-	int i;
-
-	len = strlen( file );
-	for( i = len - 1; i >= 0 && file[i] != '.' && file[i] != '/'; i-- );
-	if( file[i] == '/' ) {
-		strcpy( save, "application/download" );
-		return save;
-	}
-	/* images */
-	if( strcmp( file+i, ".gif" ) == 0 ) strcpy( save, "image/gif" );
-	if( strcmp( file+i, ".jpg" ) == 0 ) strcpy( save, "image/jpeg" );
-	if( strcmp( file+i, ".bmp" ) == 0 ) strcpy( save, "image/bmp" );
-	if( strcmp( file+i, ".ico" ) == 0 ) strcpy( save, "image/x-icon" );
-	if( strcmp( file+i, ".png" ) == 0 ) strcpy( save, "image/png" );
-	/* text */
-	if( strcmp( file+i, ".html" ) == 0 ) strcpy( save, "text/html" );
-	if( strcmp( file+i, ".c" ) == 0 ) strcpy( save, "text/plain" );
-	if( strcmp( file+i, ".css" ) == 0 ) strcpy( save, "text/css" );
-	if( strcmp( file+i, ".htm" ) == 0 ) strcpy( save, "text/html" );
-	/* application */
-	if( strcmp( file+i, ".js" ) == 0 ) strcpy( save, "application/x-javascript" );
-	if( strcmp( file+i, ".pdf" ) == 0 ) strcpy( save, "application/pdf" );
-	if( strcmp( file+i, ".doc" ) == 0 ) strcpy( save, "application/msword" );
-	if( strcmp( file+i, ".ppt" ) == 0 ) strcpy( save, "application/vnd.ms-powerpoint");
-	/* video & audio*/
-	if( strcmp( file+i, ".mp3" ) == 0 ) strcpy( save, "audio/mpeg" );
-	if( strcmp( file+i, ".wav" ) == 0 ) strcpy( save, "audio/x-wav" );
-	if( strcmp( file+i, ".avi" ) == 0 ) strcpy( save, "video/x-msvideo" );
-	if( strcmp( file+i, ".mpg" ) == 0 ) strcpy( save, "video/mpeg" );
-	if( strcmp( file+i, ".mov" ) == 0 ) strcpy( save, "video/quicktime" );
-
-	return save;
-}
-/*
-void filesend( int client, char * file ){
-	char buf[ LINEBUF ];
-	int fd,n;
-	fd = open( file, O_RDONLY );
-	while( (n=read(fd,buf,LINEBUF)) != 0 )
-		write( client, buf, n );
-}
-*/
 void Request::processGet( int isget ){
 	string file, filetype;
 	struct stat fileinfo;
