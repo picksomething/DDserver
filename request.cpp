@@ -93,42 +93,26 @@ void filesend( int client, char * file ){
 	while( (n=read(fd,buf,LINEBUF)) != 0 )
 		write( client, buf, n );
 }
-
-void process_get( Request *p, int isget ){
-	char file[ LINEBUF ], filetype[ 50 ];;
-	char buf[ LINEBUF ];
+*/
+void Request::processGet( int isget ){
+	string file, filetype;
 	struct stat fileinfo;
 
-	
-	strcpy( file, server_root );
-	strcpy( file + strlen(file), p->url );
+	file.assign( server_root  );
+	file.append( url );
 	
 
-	if( lstat( file, &fileinfo ) < 0 ){
-		p->status = 404;
-		send_response( p );
-	}
-	else if( S_ISREG( fileinfo.st_mode )  ){
-			
-		strcpy( buf, "HTTP/1.1 200 OK\r\nConnection: close\r\n" );
-		send( p->sock, buf, strlen(buf), 0 );
-		sprintf( buf, "Content-Length: %d\r\n",(int) fileinfo.st_size );
-		send( p->sock, buf, strlen(buf), 0 );
-		sprintf( buf, "Content-Type: %s\r\n\r\n",getfiletype(file, filetype));
-		send( p->sock, buf, strlen(buf), 0 );
-
-		if( isget ) filesend( p->sock, file );
-	}
+	if( lstat( file.c_str(), &fileinfo ) < 0 )
+		send_r_404();
+	else if( S_ISREG( fileinfo.st_mode )  )
+		send_r_200(isget?file:"", (int)fileinfo.st_size );
 	else if( S_ISDIR( fileinfo.st_mode ) ){
-		if( p->url[ strlen(p->url)-1 ] != '/' ){
-			strcat( p->url, "/" );
-			p->status = 301;
-			send_response( p );
-		}
+		if( url[ url.length()-1 ] != '/' )
+			send_r_301( url+"/" );
 		else{
-			strcat( p->url, "/index.html" );
-			process_get( p , isget );
+			url += "/index.html";
+			processGet( isget );
 		}
 	}
 }
-*/
+

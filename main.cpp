@@ -19,7 +19,7 @@ int main(void){
 			err_exit("accept");
 		Request rqst( connfd );	
 		rqst.getRequest();
-
+		rqst.processGet();
 		close(connfd);
 	}
 
