@@ -5,6 +5,7 @@
 #include<cstdio>
 #include<cstring>
 #include<cstdlib>
+#include<ctime>
 
 #include<unistd.h>
 #include<fcntl.h>
@@ -17,10 +18,11 @@
 using namespace std;
 
 #define MAXCONN 88
-#define URLBUF 256
+#define URL_TOO_LONG 256
 #define PATHBUF 1024
 #define LINEBUF 1024
 #define HOSTBUF 32
+#define REQ_TIMEOUT 5
 
 /* utils */
 void err_exit( const char *s );

@@ -19,9 +19,8 @@ int main(void){
 		if( connfd < 0 ) 
 			err_exit("accept");
 		Request rqst( connfd );	
-		rqst.getRequest();
-		rqst.processGet();
-		close(connfd);
+		rqst.handle();
+
 	}
 
 	close(server_sock);

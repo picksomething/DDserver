@@ -17,15 +17,22 @@ bool endswith( const char *s , const char *end ){
 	return strcmp( s + lens - lenend, end ) == 0 ;
 }
 
-void Request::getRequest( void ){
+bool Request::getRequest( void ){
 	char buf[ LINEBUF * 10 ], *at;
 	size_t start, end, n;
 	size_t keystart, keyend, valuestart, valueend;
 	string key, value;
-
+	
+	time_t acceptend;
+	time_t acceptstart = time(NULL);
 	for( at = buf; ; at += n ){
 		n = read( sock, at, LINEBUF );
 		*(at+n) = '\0';
+		acceptend = time(NULL);
+		if( acceptend - acceptstart > REQ_TIMEOUT ){
+			send_r_408();
+			return false;
+		}
 		if( endswith(buf,"\r\n\r\n") ) break;
 	}
 	at += n;
@@ -40,6 +47,7 @@ void Request::getRequest( void ){
 	start = end + 1;
 	end = msg.find( ' ', start );
 	url = msg.substr( start, end - start );
+	if( url.length() > URL_TOO_LONG ){ send_r_414();return false;}
 
 	//提取HTTP版本
 	start = end + 1;
@@ -61,10 +69,10 @@ void Request::getRequest( void ){
 		
 		keystart = valueend + 2;
 	}
-	//cout <<host << endl;
+	return true;
 }
 
-void Request::processGet( int isget ){
+void Request::processGet( bool isget ){
 	string file, filetype;
 	struct stat fileinfo;
 
@@ -86,3 +94,8 @@ void Request::processGet( int isget ){
 	}
 }
 
+void Request::handle( void ){
+	if( getRequest() ){
+		processGet( true );
+	}
+}

@@ -35,6 +35,7 @@ void Request::send_r_200( string file, int filesize ){
 	if( file != "" ) writein( sock, file );
 }
 
+// 404 Not Found
 void Request::send_r_404( void ){
 	char buf[ LINEBUF ];
 	char html[] = "<html><head><title>404 Not Found</title></head>"
@@ -50,6 +51,38 @@ void Request::send_r_404( void ){
 	write( sock, buf, strlen(buf) );
 }
 
+// 414 Request Too Long
+void Request::send_r_414( void ){
+	char buf[ LINEBUF ];
+	char html[] = "<html><head><title>414 Request URI Too Long</title></head>"
+				  "<body><h1> 414 Request URI Too Long </h1>"
+				  "The requested URL is too long on this server!"
+				  "</body></html>";
+
+	sprintf( buf, "HTTP/1.1 414 Request Too Long\r\n"
+				  "Connection: close\r\n"
+				  "Content-Type: text/html\r\n"
+				  "Content-Length: %d\r\n\r\n%s", strlen(html), html );
+
+	write( sock, buf, strlen(buf) );
+}
+
+// 408 Request Timeout
+void Request::send_r_408( void ){
+	char buf[ LINEBUF ];
+	char html[] = "<html><head><title>408 Request Timeout</title></head>"
+				  "<body><h1> 408 Request Timeout </h1>"
+				  "You're TIME OUT!"
+				  "</body></html>";
+
+	sprintf( buf, "HTTP/1.1 408 Request Timeout\r\n"
+				  "Connection: close\r\n"
+				  "Content-Type: text/html\r\n"
+				  "Content-Length: %d\r\n\r\n%s", strlen(html), html );
+	write( sock, buf, strlen(buf) );
+}
+
+// 301 Move Permenatly
 void Request::send_r_301( string location ){
 	string res;
 
