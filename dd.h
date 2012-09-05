@@ -1,6 +1,10 @@
-#include<stdio.h>
-#include<string.h>
-#include<stdlib.h>
+#include<iostream>
+#include<fstream>
+#include<sstream>
+#include<string>
+#include<cstdio>
+#include<cstring>
+#include<cstdlib>
 
 #include<unistd.h>
 #include<fcntl.h>
@@ -9,6 +13,8 @@
 #include<sys/socket.h>
 #include<errno.h>
 #include<netinet/in.h>
+
+using namespace std;
 
 #define MAXCONN 88
 #define URLBUF 256
@@ -22,23 +28,12 @@ int server_start(void);
 
 /* main */
 extern int server_port;
-extern char server_root[ PATHBUF ];
+extern string server_root;
 extern int setsockoptflag;
 extern int server_sock;
 
 /* request */
-struct request{
-	char method[10];
-	char url[ PATHBUF * 10 ];
-	char version[10];
+#include"request.h"
 
-	char host[ HOSTBUF ];
-
-	int sock,status;
-	char res[ LINEBUF * 10 ];
-};
-struct request * get_request( int client );
-void process_get( struct request *p, int isget );
-
-/* response */
-void send_response( struct request *p );
+/* signals */
+extern void set_signals( void );
