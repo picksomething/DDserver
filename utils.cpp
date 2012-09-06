@@ -1,3 +1,4 @@
+
 #include "dd.h"
 
 void err_exit(const char *s ){
@@ -5,6 +6,38 @@ void err_exit(const char *s ){
 	exit(1);
 }
 
+void get_config( int argc, char *argv[]){
+	int opt;
+	while( (opt=getopt(argc,argv,"p:r:h")) != -1 ){
+		switch( opt ){
+			case 'r': 
+				server_root.assign( optarg, optarg+strlen(optarg) );
+				break;
+			case 'p':
+				sscanf( optarg, "%d", &server_port );
+				break;
+			case 'h':
+			default:
+				puts("Usage: dd [-p port] [-r docroot] [-h]");
+				exit(0);
+		}
+	}
+	
+}
+
+int Accept( int fd, struct sockaddr *sa, socklen_t * p ){
+	int client;
+	while( true ){
+		client = accept( fd, sa, p );
+		if( client < 0 ){
+			if( errno == ECONNABORTED || errno == EINTR )
+				continue;
+			else
+				err_exit("accept failed");
+		}
+		return client;
+	}
+}
 
 int server_start( void ){
 	int fd;

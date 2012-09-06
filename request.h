@@ -24,6 +24,8 @@ public:
 	void send_r_404( void );
 	void send_r_408( void );
 	void send_r_414( void );
+	void send_r_501( void );
+	void send_r_505( void );
 };
 
 #endif

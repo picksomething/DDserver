@@ -10,6 +10,7 @@ void handle_sigsegv( int dummy ){
 
 void handle_sigint( int dummy ){
 	cerr << "Caught SIGINT: continue " << endl;
+//	exit(1);
 }
 
 void handle_sigterm( int dummy ){
@@ -29,7 +30,7 @@ void handle_sigchld( int dummy ){
 }
 
 void handle_sigabrt( int dummy ){
-	cerr << "what happend?" << endl;
+	cerr << "Caught SIGABRT: fuck ,what happend?" << endl;
 }
 
 void set_signals( void ){
@@ -39,15 +40,15 @@ void set_signals( void ){
 	p = &oct.sa_mask;
 	oct.sa_flags = 0;
 	sigemptyset( p );
-//	sigaddset( p, SIGINT );
+	sigaddset( p, SIGINT );
 	sigaddset( p, SIGSEGV );
 	sigaddset( p, SIGTERM );
 	sigaddset( p, SIGPIPE );
 	sigaddset( p, SIGCHLD );
 	sigaddset( p, SIGABRT );
 
-//	oct.sa_handler = handle_sigint;
-//	sigaction( SIGINT, &oct, NULL );
+	oct.sa_handler = handle_sigint;
+	sigaction( SIGINT, &oct, NULL );
 
 	oct.sa_handler = handle_sigsegv;
 	sigaction( SIGSEGV, &oct, NULL );

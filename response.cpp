@@ -81,6 +81,35 @@ void Request::send_r_408( void ){
 				  "Content-Length: %d\r\n\r\n%s", strlen(html), html );
 	write( sock, buf, strlen(buf) );
 }
+// 501 Not Implemented
+void Request::send_r_501( void ){
+	char buf[ LINEBUF ];
+	char html[] = "<html><head><title>501 Not Implemented</title></head>"
+				  "<body><h1> 501 Not Implemented </h1>"
+				  "We haven't implemented this!"
+				  "</body></html>";
+
+	sprintf( buf, "HTTP/1.1 501 Not Implement\r\n"
+				  "Connection: close\r\n"
+				  "Content-Type: text/html\r\n"
+				  "Content-Length: %d\r\n\r\n%s", strlen(html), html );
+	write( sock, buf, strlen(buf) );
+}
+
+// 505 Http Version Not Supported
+void Request::send_r_505( void ){
+	char buf[ LINEBUF ];
+	char html[] = "<html><head><title>505 Version Not Supported</title></head>"
+				  "<body><h1> 505 Version Not Supported </h1>"
+				  "HTTP version 1.1 is only supported!"
+				  "</body></html>";
+
+	sprintf( buf, "HTTP/1.1 505 Version Not Supported\r\n"
+				  "Connection: close\r\n"
+				  "Content-Type: text/html\r\n"
+				  "Content-Length: %d\r\n\r\n%s", strlen(html), html );
+	write( sock, buf, strlen(buf) );
+}
 
 // 301 Move Permenatly
 void Request::send_r_301( string location ){

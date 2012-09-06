@@ -42,7 +42,8 @@ bool Request::getRequest( void ){
 	start = end = 0;
 	end = msg.find( ' ' , start );
 	method = msg.substr( start, end - start );
-	
+	if( method!="GET" && method!="HEAD" ){send_r_501();return false; }
+
 	//提取url
 	start = end + 1;
 	end = msg.find( ' ', start );
@@ -53,6 +54,7 @@ bool Request::getRequest( void ){
 	start = end + 1;
 	end = msg.find( '\r', start );
 	version = msg.substr( start, end - start );
+	if( version != "HTTP/1.1" ) { send_r_505();return false;}
 
 //	cout << msg << endl;
 
@@ -96,6 +98,9 @@ void Request::processGet( bool isget ){
 
 void Request::handle( void ){
 	if( getRequest() ){
-		processGet( true );
+		if( method == "GET" )
+			processGet( true );
+		if( method == "HEAD" ) 
+			processGet( false);
 	}
 }
